@@ -16,7 +16,6 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
@@ -63,12 +62,12 @@ public class MainActivity extends AppCompatActivity {
         try {
             liczbaKostek = Integer.parseInt(inputText);
         } catch (NumberFormatException e) {
-            Toast.makeText(this, "Niepoprawna liczba", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Nieprawidłowa wartość", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        if (liczbaKostek <= 0) {
-            Toast.makeText(this, "Liczba kostek musi być większa od 0", Toast.LENGTH_SHORT).show();
+        if (liczbaKostek <= 0 || liczbaKostek > 100) {
+            Toast.makeText(this, "Liczba kostek musi być z zakresu od 1 do 100", Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -85,37 +84,68 @@ public class MainActivity extends AppCompatActivity {
         gridKostki.removeAllViews();
         for (int i = 0; i < wylosowaneKostki.size(); i++) {
             TextView tv = new TextView(this);
-            tv.setText("Kostka " + (i + 1) + ": " + wylosowaneKostki.get(i));
+            tv.setText(String.valueOf(wylosowaneKostki.get(i)));
             tv.setTextSize(18);
-            tv.setPadding(10, 10, 10, 10);
+            tv.setPadding(16, 16, 16, 16);
             tv.setGravity(Gravity.CENTER);
             gridKostki.addView(tv);
         }
     }
 
     private void obliczIWyswietlWyniki() {
-        int suma = 0;
-        for (int kostka : wylosowaneKostki) {
-            suma += kostka;
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < wylosowaneKostki.size(); i++) {
+            sb.append(wylosowaneKostki.get(i));
+            if (i < wylosowaneKostki.size() - 1) {
+                sb.append(", ");
+            }
         }
-        textViewWyniki.setText("Suma oczek: " + suma);
+        textViewWyniki.setText(sb.toString());
     }
 
     private void sortujRosnaco() {
         if (wylosowaneKostki.isEmpty()) {
-            Toast.makeText(this, "Najpierw wylosuj kostki", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Najpierw należy wylosować kostki", Toast.LENGTH_SHORT).show();
             return;
         }
-        Collections.sort(wylosowaneKostki);
+        sortujRosnacoAlgorytm(wylosowaneKostki);
         wyswietlKostki();
+        obliczIWyswietlWyniki();
     }
 
     private void sortujMalejaco() {
         if (wylosowaneKostki.isEmpty()) {
-            Toast.makeText(this, "Najpierw wylosuj kostki", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Najpierw należy wylosować kostki", Toast.LENGTH_SHORT).show();
             return;
         }
-        wylosowaneKostki.sort(Collections.reverseOrder());
+        sortujMalejacoAlgorytm(wylosowaneKostki);
         wyswietlKostki();
+        obliczIWyswietlWyniki();
+    }
+
+    private void sortujRosnacoAlgorytm(List<Integer> lista) {
+        int n = lista.size();
+        for (int i = 0; i < n - 1; i++) {
+            for (int j = 0; j < n - i - 1; j++) {
+                if (lista.get(j) > lista.get(j + 1)) {
+                    int temp = lista.get(j);
+                    lista.set(j, lista.get(j + 1));
+                    lista.set(j + 1, temp);
+                }
+            }
+        }
+    }
+
+    private void sortujMalejacoAlgorytm(List<Integer> lista) {
+        int n = lista.size();
+        for (int i = 0; i < n - 1; i++) {
+            for (int j = 0; j < n - i - 1; j++) {
+                if (lista.get(j) < lista.get(j + 1)) {
+                    int temp = lista.get(j);
+                    lista.set(j, lista.get(j + 1));
+                    lista.set(j + 1, temp);
+                }
+            }
+        }
     }
 }
